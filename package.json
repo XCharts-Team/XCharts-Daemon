@@ -3,7 +3,7 @@
   "displayName": "XCharts-Daemon",
   "version": "1.0.0",
   "unity": "2018.3",
-  "description": "A daemon for XCharts to ensure version updates.",
+  "description": "A daemon that ensures proper compilation after a version update for XCharts.",
   "keywords": [
     "unity",
     "xcharts",
