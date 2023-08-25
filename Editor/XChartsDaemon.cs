@@ -49,7 +49,7 @@ namespace XCharts.Daemon
 #endif
         }
 
-         #region Text mesh pro support
+        #region Text mesh pro support
 #if UNITY_2017_1_OR_NEWER
         const string SYMBOL_TMP = "dUI_TextMeshPro";
         const string ASMDEF_TMP = "Unity.TextMeshPro";
@@ -98,6 +98,11 @@ namespace XCharts.Daemon
         private static void InsertSpecifyReferenceIntoAssembly(Platform platform, string reference)
         {
             var file = GetPackageAssemblyDefinitionPath(platform);
+            if (!File.Exists(file))
+            {
+                Debug.LogError("Can't find assembly definition file in path:" + file);
+                return;
+            }
             var content = File.ReadAllText(file);
             var data = new AssemblyDefinitionData();
             EditorJsonUtility.FromJsonOverwrite(content, data);
@@ -106,14 +111,18 @@ namespace XCharts.Daemon
                 data.references.Add(reference);
                 var json = EditorJsonUtility.ToJson(data, true);
                 File.WriteAllText(file, json);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
+                AssetDatabase.ImportAsset(GetAsmdefAssetPath(platform, file));
             }
         }
 
         private static void RemoveSpecifyReferenceFromAssembly(Platform platform, string reference)
         {
             var file = GetPackageAssemblyDefinitionPath(platform);
+            if (!File.Exists(file))
+            {
+                Debug.LogError("Can't find assembly definition file in path:" + file);
+                return;
+            }
             var content = File.ReadAllText(file);
             var data = new AssemblyDefinitionData();
             EditorJsonUtility.FromJsonOverwrite(content, data);
@@ -122,6 +131,19 @@ namespace XCharts.Daemon
                 data.references.Remove(reference);
                 var json = EditorJsonUtility.ToJson(data, true);
                 File.WriteAllText(file, json);
+                AssetDatabase.ImportAsset(GetAsmdefAssetPath(platform, file));
+            }
+        }
+
+        private static string GetAsmdefAssetPath(Platform platform, string filePath)
+        {
+            if (filePath.Contains("PackageCache/"))
+            {
+                return string.Format("Packages/com.monitor1394.xcharts/{0}/XCharts.{1}.asmdef", platform.ToString(), platform.ToString());
+            }
+            else
+            {
+                return filePath.Substring(filePath.IndexOf("Assets/"));
             }
         }
 
