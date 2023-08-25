@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace XCharts.Daemon
 {
@@ -26,7 +24,7 @@ namespace XCharts.Daemon
         public static void CheckAddedAsset(string assetPath)
         {
             var fileName = Path.GetFileName(assetPath);
-            if (fileName.Equals("XCSettings.asset"))
+            if (fileName.Equals("XChartsMgr.cs"))
             {
                 CheckAsmdef();
             }
@@ -137,13 +135,14 @@ namespace XCharts.Daemon
 
         private static string GetAsmdefAssetPath(Platform platform, string filePath)
         {
-            if (filePath.Contains("PackageCache/"))
+            filePath = filePath.Replace("\\", "/");
+            if (filePath.Contains("Assets/"))
             {
-                return string.Format("Packages/com.monitor1394.xcharts/{0}/XCharts.{1}.asmdef", platform.ToString(), platform.ToString());
+                return filePath.Substring(filePath.IndexOf("Assets/"));
             }
             else
             {
-                return filePath.Substring(filePath.IndexOf("Assets/"));
+                return string.Format("Packages/com.monitor1394.xcharts/{0}/XCharts.{1}.asmdef", platform.ToString(), platform.ToString());
             }
         }
 
@@ -201,6 +200,5 @@ namespace XCharts.Daemon
         }
 #endif
         #endregion
-
     }
 }
